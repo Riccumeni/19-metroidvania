@@ -5,30 +5,30 @@ using TMPro;
 public class TextController : MonoBehaviour
 {
     public GameObject player;
+    public GameObject hpContainer;
+    public GameObject scoreContainer;
+    
+    private RectTransform rectHp;
+
+    private TextMeshProUGUI scoreText;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        rectHp = hpContainer.GetComponent<RectTransform>();
+        scoreText = scoreContainer.GetComponent<TextMeshProUGUI>();
     }
 
     // Update is called once per frame
     void Update()
     {
         int hp = player.GetComponent<PlayerController>().getHp();
+        int score = player.GetComponent<PlayerController>().getScore();
 
         float dim = ((float) hp / 50) * 900;
 
-        RectTransform rect = GetComponent<RectTransform>();
+        rectHp.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, dim);
 
-        rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, dim);
-
-        // resize(dim, new Vector3(1, 0, 0));
-    }
-
-    public void resize(float amount, Vector3 direction)
-    {
-        transform.position += direction * amount / 2; // Move the object in the direction of scaling, so that the corner on ther side stays in place
-        transform.localScale += direction * amount; // Scale object in the specified direction
+        scoreText.text = "SCORE: " + score.ToString();
     }
 }

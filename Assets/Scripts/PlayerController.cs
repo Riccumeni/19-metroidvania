@@ -1,14 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+    private const int maxHp = 50;
+    private int hp = maxHp;
+    private int score = 0;
+
     public AudioClip slash;
     public AudioClip footstep;
     private AudioSource audioSource;
-    private const int maxHp = 50;
-    private int hp = maxHp;
+    
     public GameObject obj;
     private Animator animator;
     private BoxCollider2D boxCollider;
@@ -34,10 +38,15 @@ public class PlayerController : MonoBehaviour
     }
 
     void OnCollisionEnter2D(Collision2D collision){
+
         if(collision.collider.tag == "Terrain"){
             animator.SetBool("Grounded", true);
             animator.SetBool("Jump", false);
             animator.SetBool("sliding", false);
+        }
+
+        if(collision.collider.tag == "Death"){
+            SceneManager.LoadScene(2);
         }
     }
 
@@ -179,6 +188,11 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("AirSpeedY", -1);
     }
 
+    IEnumerator death(){
+        yield return new WaitForSeconds(1.5f);
+        SceneManager.LoadScene(2);
+    }
+
     public void damage(int enemyDamage){
         if(invincibility == false){
             if(animator.GetBool("IdleBlock")){
@@ -187,21 +201,27 @@ public class PlayerController : MonoBehaviour
             else{
                 hp -= enemyDamage;
             }
-            Debug.Log(hp);
             if(hp > 0){
                 animator.SetTrigger("Hurt");
             }else{
                 animator.SetTrigger("Death");
+                StartCoroutine(death());
             }
             rb.AddForce(new Vector2(-2.0f, 1f) * 1f, ForceMode2D.Impulse);
         }else{
             Debug.Log("E' invincibile");
         }
-        
-        
     }
 
     public int getHp(){
         return hp;
+    }
+
+    public void addScore(){
+        score+=100;
+    }
+
+    public int getScore(){
+        return score;
     }
 }

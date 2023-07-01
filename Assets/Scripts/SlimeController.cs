@@ -8,6 +8,9 @@ public class SlimeController : MonoBehaviour
     private const int maxHp = 20;
     private int hp = maxHp;
 
+    private double startX = 0;
+    private double endX = 0;
+
     private bool isRight = true;
 
     public AudioClip deathSound;
@@ -29,6 +32,7 @@ public class SlimeController : MonoBehaviour
                     anim.SetTrigger("death");
                     audioSource.clip = deathSound;
                     audioSource.Play();
+                    collision.gameObject.GetComponent<PlayerController>().addScore();
                     Destroy(this.gameObject, 1.5f);
                 }
                 Debug.Log("hp Slime: " + hp);
@@ -37,10 +41,6 @@ public class SlimeController : MonoBehaviour
                 audioSource.Play();
                 rb.AddForce(new Vector2(-1.0f, 0.5f) * 0.25f, ForceMode2D.Impulse);
             }
-        }
-
-        if(collision.gameObject.tag == "Wall"){
-            isRight = !isRight; 
         }
     }
 
@@ -65,17 +65,19 @@ public class SlimeController : MonoBehaviour
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
+
+        startX = transform.position.x - 2;
+        endX = transform.position.x + 2;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(transform.position.x > endX || transform.position.x < startX){
+            isRight = !isRight;
+        }
         if(hp > 0){
-            if(isRight){
-                this.transform.Translate(new Vector2(0.5f * Time.deltaTime, 0), 0);
-            }else{
-                this.transform.Translate(new Vector2(-0.5f * Time.deltaTime, 0), 0);
-            }
+            this.transform.Translate(new Vector2((isRight ? 0.5f : -0.5f) * Time.deltaTime, 0), 0);
         }
         
     }
